@@ -4,7 +4,7 @@ using Dalamud.Interface.Windowing;
 
 namespace SamplePlugin.Windows;
 
-public class ConfigWindow : Window, IDisposable
+public class ConfigWindow : Window
 {
     private readonly Configuration configuration;
 

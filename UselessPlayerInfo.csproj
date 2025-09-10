@@ -2,9 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <RepositoryUrl></RepositoryUrl>
+    <AssemblyVersion>0.0.0.1</AssemblyVersion>
+    <FileVersion>0.0.0.1</FileVersion>
+    <Description>A plugin for displaying useless information. </Description>
+    <PackageProjectUrl>https://github.com/DetanShi/UselessPlayerInfo</PackageProjectUrl>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <AnalysisLevel>6.0-minimum</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,36 +27,47 @@
   <ItemGroup>
     <Reference Include="Dalamud">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Dalamud.Bindings.ImGui">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.Bindings.ImGui.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Dalamud.Bindings.ImGuizmo">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.Bindings.ImGuizmo.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Dalamud.Bindings.ImPlot">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.Bindings.ImPlot.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="FFXIVClientStructs">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="InteropGenerator.Runtime">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\InteropGenerator.Runtime.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Lumina">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Lumina.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Lumina.Excel">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Extensions.ObjectPool">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Microsoft.Extensions.ObjectPool.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Serilog">
       <HintPath>..\..\..\..\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Serilog.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 
