@@ -1,0 +1,20 @@
+{
+  "Author": "Lunarris",
+  "Name": "Useless Player Info",
+  "InternalName": "UselessPlayerInfo",
+  "AssemblyVersion": "1.0.0.0",
+  "Description": "A simple program that shows some useless info on your character's current location. /openmenu and /helloworld are the current commands.",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "sample",
+    "plugin",
+    "goats"
+  ],
+  "DalamudApiLevel": 13,
+  "LoadRequiredState": 0,
+  "LoadSync": false,
+  "CanUnloadAsync": false,
+  "LoadPriority": 0,
+  "Punchline": "Ever wanted to see some useless info for no reason?.",
+  "AcceptsFeedback": true
+}
