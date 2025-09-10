@@ -8,10 +8,11 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Lumina.Excel.Sheets;
-using SamplePlugin.Windows;
+using UselessPlayerInfo.Windows;
+using UselessPlayerInfo.Functions;
 
 
-namespace SamplePlugin;
+namespace UselessPlayerInfo;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -24,13 +25,13 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IToastGui ToastGui { get; private set; } = null!;
 
-    private const string CommandName = "/openmenu";
-    private const string CommandName2 = "/helloworld";
+    private const string MenuCommand = "/openmenu";
+    private const string ToastLevel = "/whatsmylevel";
 
 
     public Configuration Configuration { get; init; }
 
-    public readonly WindowSystem WindowSystem = new("SamplePlugin");
+    public readonly WindowSystem WindowSystem = new("UselessInfo");
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
 
@@ -44,14 +45,14 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(MenuCommand, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Opens the basic GUI for this plugin."
         });
 
-        CommandManager.AddHandler(CommandName2, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(ToastLevel, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Say Hello World and show current zone"
+            HelpMessage = "Show's your current level and Job in a toast."
         });
 
         // Tell the UI system that we want our windows to be drawn throught he window system
@@ -82,7 +83,8 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Dispose();
         MainWindow.Dispose();
 
-        CommandManager.RemoveHandler(CommandName);
+        CommandManager.RemoveHandler(MenuCommand);
+        CommandManager.RemoveHandler(ToastLevel);
     }
 
     private void OnCommand(string command, string args)
@@ -90,29 +92,12 @@ public sealed class Plugin : IDalamudPlugin
 
         switch (command)
         {
-            case CommandName:
+            case MenuCommand:
                 // In response to the slash command, toggle the display status of our main ui
                 MainWindow.Toggle();
                 break;
-            case CommandName2:
-                var territoryId = Plugin.ClientState.TerritoryType;
-                if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-                {
-                    var zoneName = territoryRow.PlaceName.Value.Name.ToString();
-
-                    // Print to chat
-                    ChatGui.Print(new XivChatEntry
-                    {
-                        Message = $"Hello World! You are in: {zoneName}",
-                        Type = XivChatType.SystemMessage
-                    });
-                    // Toast notification
-                    ToastGui.ShowQuest($"Hello World! You are in: {zoneName}");
-                }
-                else
-                {
-                    ToastGui.ShowQuest($"Hello World! You are not in a valid zone.");
-                }
+            case ToastLevel:
+                Helpers.ZoneToast(this);
                 break;
             default:
                 break;
@@ -122,4 +107,6 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleConfigUi() => ConfigWindow.Toggle();
     public void ToggleMainUi() => MainWindow.Toggle();
+
+
 }

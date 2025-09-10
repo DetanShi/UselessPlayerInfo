@@ -2,7 +2,7 @@
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
 
-namespace SamplePlugin.Windows;
+namespace UselessPlayerInfo.Windows;
 
 public class ConfigWindow : Window
 {

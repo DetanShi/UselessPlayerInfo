@@ -5,7 +5,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Lumina.Excel.Sheets;
 
-namespace SamplePlugin.Windows;
+namespace UselessPlayerInfo.Windows;
 
 public class MainWindow : Window
 {
@@ -65,13 +65,21 @@ public class MainWindow : Window
                 }
 
                 // If you want to see the Macro representation of this SeString use `ToMacroString()`
-                ImGui.TextUnformatted($"Our current job is ({localPlayer.ClassJob.RowId}) \"{localPlayer.ClassJob.Value.Abbreviation}\"");
+                ImGui.TextUnformatted($"{localPlayer.ClassJob.Value.NameEnglish}/{localPlayer.ClassJob.Value.Abbreviation} - and is level {localPlayer.Level}");
 
                 // Example for quarrying Lumina directly, getting the name of our current area.
                 var territoryId = Plugin.ClientState.TerritoryType;
                 if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
                 {
-                    ImGui.TextUnformatted($"We are currently in ({territoryId}) \"{territoryRow.PlaceName.Value.Name}\"");
+                    switch (territoryId)
+                    {
+                        case 1249:
+                            ImGui.TextUnformatted($"We are currently in ({territoryId}) \"Private Estate\"");
+                            break;
+                        default:
+                            ImGui.TextUnformatted($"We are currently in ({territoryId}) \"{territoryRow.PlaceName.Value.Name}\"");
+                            break;
+                    }
                 }
                 else
                 {
