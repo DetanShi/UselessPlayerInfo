@@ -9,8 +9,6 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Lumina.Excel.Sheets;
 using UselessPlayerInfo.Windows;
-using UselessPlayerInfo.Functions;
-
 
 namespace UselessPlayerInfo;
 
@@ -97,7 +95,24 @@ public sealed class Plugin : IDalamudPlugin
                 MainWindow.Toggle();
                 break;
             case ToastLevel:
-                Helpers.ZoneToast(this);
+                var territoryId = Plugin.ClientState.TerritoryType;
+                if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+                {
+                    var zoneName = territoryRow.PlaceName.Value.Name.ToString();
+
+                    // Print to chat
+                    ChatGui.Print(new XivChatEntry
+                    {
+                        Message = $"Hello World! You are in: {zoneName}",
+                        Type = XivChatType.SystemMessage
+                    });
+                    // Toast notification
+                    ToastGui.ShowQuest($"Hello World! You are in: {zoneName}");
+                }
+                else
+                {
+                    ToastGui.ShowQuest($"Hello World! You are not in a valid zone.");
+                }
                 break;
             default:
                 break;
