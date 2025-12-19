@@ -23,8 +23,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IToastGui ToastGui { get; private set; } = null!;
 
-    private const string MenuCommand = "/openmenu";
-    private const string ToastLevel = "/whatsmylevel";
+    private const string MenuCommand = "/uselessinfo";
 
 
     public Configuration Configuration { get; init; }
@@ -82,7 +81,6 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow.Dispose();
 
         CommandManager.RemoveHandler(MenuCommand);
-        CommandManager.RemoveHandler(ToastLevel);
     }
 
     private void OnCommand(string command, string args)
@@ -93,26 +91,6 @@ public sealed class Plugin : IDalamudPlugin
             case MenuCommand:
                 // In response to the slash command, toggle the display status of our main ui
                 MainWindow.Toggle();
-                break;
-            case ToastLevel:
-                var territoryId = Plugin.ClientState.TerritoryType;
-                if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-                {
-                    var zoneName = territoryRow.PlaceName.Value.Name.ToString();
-
-                    // Print to chat
-                    ChatGui.Print(new XivChatEntry
-                    {
-                        Message = $"Hello World! You are in: {zoneName}",
-                        Type = XivChatType.SystemMessage
-                    });
-                    // Toast notification
-                    ToastGui.ShowQuest($"Hello World! You are in: {zoneName}");
-                }
-                else
-                {
-                    ToastGui.ShowQuest($"Hello World! You are not in a valid zone.");
-                }
                 break;
             default:
                 break;
