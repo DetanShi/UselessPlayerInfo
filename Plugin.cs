@@ -1,4 +1,6 @@
-﻿using Dalamud.Bindings.ImGui;
+﻿using System.Linq;
+using System.Net.Http;
+using Dalamud.Bindings.ImGui;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Game.Text;
@@ -8,6 +10,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Lumina.Excel.Sheets;
+using UselessPlayerInfo.Functions;
 using UselessPlayerInfo.Windows;
 
 namespace UselessPlayerInfo;
@@ -18,69 +21,86 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
+    [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
+    [PluginService] internal static IPlayerState PlayerState { get; private set; } = null!;
+    [PluginService] internal static IUnlockState UnlockState { get; private set; } = null!;
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IToastGui ToastGui { get; private set; } = null!;
 
-    private const string MenuCommand = "/uselessinfo";
-
+    private const string MainWindowCMD = "/uselessinfo";
+    private const string JobWindowCMD = "/jobinfo";
+    private const string WhereAmI = "/whereami";
+    private const string LocationsCMD = "/savedlocations";
 
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("UselessInfo");
-    private ConfigWindow ConfigWindow { get; init; }
+    private JobWindow JobWindow { get; init; }
+
+    private LocationWindow LocationWindow { get; init; }
+
     private MainWindow MainWindow { get; init; }
 
     public Plugin()
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
-        ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this);
+        JobWindow = new JobWindow(this);
+        LocationWindow = new LocationWindow(this);
+        MainWindow = new MainWindow(this);  
 
-        WindowSystem.AddWindow(ConfigWindow);
+        WindowSystem.AddWindow(JobWindow);
+        WindowSystem.AddWindow(LocationWindow);
         WindowSystem.AddWindow(MainWindow);
 
-        CommandManager.AddHandler(MenuCommand, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(MainWindowCMD, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Opens the basic GUI for this plugin."
+            HelpMessage = "Opens the Very Simple Main Window for this plugin."
         });
 
-        CommandManager.AddHandler(ToastLevel, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(JobWindowCMD, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Show's your current level and Job in a toast."
+            HelpMessage = "Opens the Locations Window for displaying all the player's Jobs and their corresponding levels."
+        });
+
+        CommandManager.AddHandler(WhereAmI, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Prints your current location information to chat."
+        });
+
+        CommandManager.AddHandler(LocationsCMD, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Opens the Locations Window for displaying saved locations. (WIP)"
         });
 
         // Tell the UI system that we want our windows to be drawn throught he window system
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
 
-        // This adds a button to the plugin installer entry of this plugin which allows
-        // toggling the display status of the configuration ui
-        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
-
         // Adds another button doing the same but for the main ui of the plugin
-        PluginInterface.UiBuilder.OpenMainUi += ToggleMainUi;
+        PluginInterface.UiBuilder.OpenMainUi += ToggleMainWindowUi;
 
         // Add a simple message to the log with level set to information
         // Use /xllog to open the log window in-game
         // Example Output: 00:57:54.959 | INF | [SamplePlugin] ===A cool log message from Sample Plugin===
-        Log.Information($"===A cool log message from {PluginInterface.Manifest.Name}===");
+        Log.Information($"UselessPlayerInfo has been loaded.");
     }
 
     public void Dispose()
     {
         // Unregister all actions to not leak anythign during disposal of plugin
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
-        PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
-        PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUi;
+        PluginInterface.UiBuilder.OpenMainUi -= ToggleMainWindowUi;
 
         WindowSystem.RemoveAllWindows();
 
-        ConfigWindow.Dispose();
-        MainWindow.Dispose();
+        JobWindow.Dispose();
 
-        CommandManager.RemoveHandler(MenuCommand);
+        CommandManager.RemoveHandler(MainWindowCMD);
+        CommandManager.RemoveHandler(JobWindowCMD);
+        CommandManager.RemoveHandler(LocationsCMD);
+        CommandManager.RemoveHandler(WhereAmI);
     }
 
     private void OnCommand(string command, string args)
@@ -88,9 +108,19 @@ public sealed class Plugin : IDalamudPlugin
 
         switch (command)
         {
-            case MenuCommand:
+            case MainWindowCMD:
                 // In response to the slash command, toggle the display status of our main ui
                 MainWindow.Toggle();
+                break;
+            case JobWindowCMD:
+                // In response to the slash command, toggle the display status of our main ui
+                JobWindow.Toggle();
+                break;
+            case WhereAmI:
+                PrintWhereAmI();
+                break;
+            case LocationsCMD:
+                LocationWindow.Toggle();
                 break;
             default:
                 break;
@@ -98,8 +128,39 @@ public sealed class Plugin : IDalamudPlugin
 
     }
 
-    public void ToggleConfigUi() => ConfigWindow.Toggle();
-    public void ToggleMainUi() => MainWindow.Toggle();
+    private void PrintWhereAmI()
+    {
+        var message = "";
 
+        // Example for quarrying Lumina directly, getting the name of our current area.
+        var territoryId = Plugin.ClientState.TerritoryType;
+        if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+            {
+                switch (territoryId)
+                {
+                    case 1249:
+                        message = $"You are currently in \"Private Estate, {Housing.GetLocationSuffix()}\"";
+                        break;
+                    default:
+                        message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}, {Housing.GetLocationSuffix()}\"";
+                        break;
+                    }
+
+                }
+                else
+                {
+                    message = "Invalid territory.";
+                }
+
+        ChatGui.Print(new XivChatEntry
+        {
+            Message = $"{message}",
+            Type = XivChatType.SystemMessage
+        });
+    }
+
+    public void ToggleMainWindowUi() => MainWindow.Toggle();
+    public void ToggleJobWindowUi() => JobWindow.Toggle();
+    public void ToggleLocationsUI() => LocationWindow.Toggle();
 
 }
