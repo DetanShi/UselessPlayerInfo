@@ -1,0 +1,26 @@
+[
+  {
+    "Author": "Lunarris",
+    "Name": "Useless Player Info",
+    "InternalName": "UselessPlayerInfo",
+    "Punchline": "Ever wanted to see some useless info for no reason?",
+    "Description": "A simple program that shows some useless info on your character's current location. /openmenu and /helloworld are the current commands.",
+    "AssemblyVersion": "0.0.0.1",
+    "RepoUrl": "https://github.com/DetanShi/UselessPlayerInfo",
+    "ApplicableVersion": "any",
+    "Tags": [
+      "sample",
+      "plugin",
+      "goats"
+    ],
+    "DalamudApiLevel": 15,
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "CanUnloadAsync": false,
+    "LoadPriority": 0,
+    "AcceptsFeedback": true,
+    "DownloadLinkInstall": "https://github.com/DetanShi/UselessPlayerInfo/releases/latest/download/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/DetanShi/UselessPlayerInfo/releases/latest/download/latest.zip",
+    "DownloadLinkTesting": "https://github.com/DetanShi/UselessPlayerInfo/releases/latest/download/latest.zip"
+  }
+]

@@ -73,7 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="UslessPlayerInfo.json">
+    <None Update="UselessPlayerInfo.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
