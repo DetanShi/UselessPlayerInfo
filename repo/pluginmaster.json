@@ -1,7 +1,7 @@
 [
   {
     "Author": "Lunarris",
-    "Name": "Useless Player Info",
+    "Name": ["Useless Player Info"],
     "InternalName": "UselessPlayerInfo",
     "Punchline": "Ever wanted to see some useless info for no reason?",
     "Description": "A simple program that shows some useless info on your character's current location. /openmenu and /helloworld are the current commands.",
