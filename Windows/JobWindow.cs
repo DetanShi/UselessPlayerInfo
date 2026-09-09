@@ -17,9 +17,10 @@ public class JobWindow : Window
     {
         (JobRole.Tank, "TNK", new Vector4(0.35f, 0.60f, 0.95f, 1f)),
         (JobRole.Healer, "HLR", new Vector4(0.40f, 0.80f, 0.45f, 1f)),
-        (JobRole.Melee, "M-DPS", new Vector4(0.90f, 0.30f, 0.30f, 1f)),
-        (JobRole.PhysicalRanged, "PhysR-DPS", new Vector4(0.85f, 0.65f, 0.20f, 1f)),
-        (JobRole.MagicalRanged, "MagR-DPS", new Vector4(0.70f, 0.40f, 0.90f, 1f)),
+        (JobRole.Melee, "mDPS", new Vector4(0.90f, 0.30f, 0.30f, 1f)),
+        (JobRole.PhysicalRanged, "prDPS", new Vector4(0.85f, 0.65f, 0.20f, 1f)),
+        (JobRole.MagicalRanged, "mrDPS", new Vector4(0.70f, 0.40f, 0.90f, 1f)),
+        (JobRole.LimitedJob, "LMT", new Vector4(0.90f, 0.800f, 0.60f, 1f)),
         (JobRole.Hand, "DoH", new Vector4(0.75f, 0.55f, 0.35f, 1f)),
         (JobRole.Land, "DoL", new Vector4(0.55f, 0.75f, 0.55f, 1f)),
     };
@@ -41,7 +42,7 @@ public class JobWindow : Window
         this.plugin = plugin;
     }
 
-    public void Dispose() { }
+    public static void Dispose() { }
 
     public override void Draw()
     {
@@ -75,8 +76,11 @@ public class JobWindow : Window
                 ImGui.SameLine();
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted($"{localPlayer.ClassJob.Value.NameEnglish} ({localPlayer.ClassJob.Value.Abbreviation}) - Level {localPlayer.Level}");
-
                 ImGui.Spacing();
+                # if DEBUG
+                ImGui.TextUnformatted($"DEBUG JOB ID - {localPlayer.ClassJob.Value.JobIndex}");
+                ImGui.Spacing();
+                # endif
                 ImGui.TextUnformatted("Job Levels");
                 ImGui.Spacing();
 

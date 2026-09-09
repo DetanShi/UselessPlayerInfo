@@ -128,7 +128,7 @@ public sealed class Plugin : IDalamudPlugin
 
     }
 
-    private void PrintWhereAmI()
+    private static void PrintWhereAmI()
     {
         var message = "";
 
@@ -157,6 +157,8 @@ public sealed class Plugin : IDalamudPlugin
             Message = $"{message}",
             Type = XivChatType.SystemMessage
         });
+
+        ToastGui.ShowNormal($"{message}");
     }
 
     public void ToggleMainWindowUi() => MainWindow.Toggle();

@@ -4,12 +4,9 @@ namespace UselessPlayerInfo.Functions;
 
 internal static class Housing
 {
-    // Apartment plots are reported with these sentinel values instead of a real plot index.
     private const sbyte ApartmentMainDivisionPlot = -128;
     private const sbyte ApartmentSubdivisionPlot = -127;
 
-    // Returns a ", Ward X, Plot Y" or ", Ward X, Room Y" suffix when the player is standing in
-    // a housing ward or inside a house/apartment, otherwise null.
     public static unsafe string? GetLocationSuffix()
     {
         var housingManager = HousingManager.Instance();

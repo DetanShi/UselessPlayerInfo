@@ -28,7 +28,7 @@ public class MainWindow : Window
         this.plugin = plugin;
     }
 
-    public void Dispose() { }
+    public static void Dispose() { }
 
     public override void Draw()
     {
