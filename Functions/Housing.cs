@@ -1,4 +1,5 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
+using UselessPlayerInfo;
 
 namespace UselessPlayerInfo.Functions;
 
@@ -34,6 +35,19 @@ internal static class Housing
             suffix += $", Plot {plot + 1}";
         }
 
+        Plugin.Log.Debug($"Current location: {suffix}");
         return suffix;
+    }
+
+    //Retrieve the original outdoor area type instead of the generic interior instance. 
+    public static unsafe uint? GetOriginalHouseTerritoryTypeId()
+    {
+        var housingManager = HousingManager.Instance();
+        if (housingManager == null || !housingManager->IsInside())
+        {
+            return null;
+        }
+        
+        return HousingManager.GetOriginalHouseTerritoryTypeId();
     }
 }

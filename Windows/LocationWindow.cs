@@ -6,6 +6,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Lumina.Excel.Sheets;
 using UselessPlayerInfo.Functions;
+using Dalamud.Interface;
 
 namespace UselessPlayerInfo.Windows;
 
@@ -41,40 +42,46 @@ public class LocationWindow : Window
             // Check if this child is drawing
             if (child.Success)
             {
+                ImGui.AlignTextToFramePadding();
 
                 var message = "";
 
                 // Example for quarrying Lumina directly, getting the name of our current area.
-                var territoryId = Plugin.ClientState.TerritoryType;
-                if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-                    {
-                        switch (territoryId)
-                        {
-                            case 1249:
-                                message = $"You are currently in \"Private Estate, {Housing.GetLocationSuffix()}\"";
-                                break;
-                            default:
-                                message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}, {Housing.GetLocationSuffix()}\"";
-                                break;
-                            }
+                var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
+                
+                //Start Debug Infor
+                ImGui.Text("DEBUG ONLY");
+                ImGui.Separator();
+                ImGui.TextUnformatted($"Debug Territory ID: {territoryId}");
+                ImGui.Spacing();
+                ImGui.TextUnformatted($"Debug is housing instance: {Housing.GetLocationSuffix() != null}");
 
-                        }
-                        else
-                        {
-                            message = "Invalid territory.";
-                        }
+                if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+                {
+                    if(Housing.GetLocationSuffix() != null)
+                    {
+                            message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}, {Housing.GetLocationSuffix()}\"";
+                    }
+                    else
+                    {
+                        message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}\"";
+                    }
+                } 
+                else
+                {
+                    message = "Invalid territory.";    
+                }
+
 
                 // Example for other services that Dalamud provides.
                 // ClientState provides a wrapper filled with information about the local player object and client.
 
                 //ImGui.SameLine();
-                ImGui.AlignTextToFramePadding();
-                ImGui.TextUnformatted("Current Location");
+                ImGui.Separator();
+                ImGui.Text("Current Location");
+                ImGui.Separator();
                 ImGui.Spacing();
                 ImGui.TextUnformatted($"{message}");
-                ImGui.Spacing();
-                ImGui.Spacing();
-                ImGui.TextUnformatted("Saved Locations");
                 ImGui.Spacing();
 
             }

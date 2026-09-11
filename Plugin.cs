@@ -32,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
     private const string MainWindowCMD = "/uselessinfo";
     private const string JobWindowCMD = "/jobinfo";
     private const string WhereAmI = "/whereami";
-    private const string LocationsCMD = "/savedlocations";
+    private const string LocationsCMD = "/locationinfo";
 
     public Configuration Configuration { get; init; }
 
@@ -132,25 +132,23 @@ public sealed class Plugin : IDalamudPlugin
     {
         var message = "";
 
-        // Example for quarrying Lumina directly, getting the name of our current area.
-        var territoryId = Plugin.ClientState.TerritoryType;
-        if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-            {
-                switch (territoryId)
-                {
-                    case 1249:
-                        message = $"You are currently in \"Private Estate, {Housing.GetLocationSuffix()}\"";
-                        break;
-                    default:
-                        message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}, {Housing.GetLocationSuffix()}\"";
-                        break;
-                    }
+        var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
 
-                }
-                else
-                {
-                    message = "Invalid territory.";
-                }
+        if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+        {
+            if(Housing.GetLocationSuffix() != null)
+            {
+                message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}, {Housing.GetLocationSuffix()}\"";
+            }
+            else
+            {
+                message = $"You are currently in \"{territoryRow.PlaceName.Value.Name}\"";
+            }
+        } 
+        else
+        {
+            message = "Invalid territory.";    
+        }
 
         ChatGui.Print(new XivChatEntry
         {
