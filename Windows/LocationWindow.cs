@@ -50,11 +50,11 @@ public class LocationWindow : Window
                 var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
                 
                 //Start Debug Infor
-                ImGui.Text("DEBUG ONLY");
-                ImGui.Separator();
-                ImGui.TextUnformatted($"Debug Territory ID: {territoryId}");
-                ImGui.Spacing();
-                ImGui.TextUnformatted($"Debug is housing instance: {Housing.GetLocationSuffix() != null}");
+                //ImGui.Text("DEBUG ONLY");
+                //ImGui.Separator();
+                //ImGui.TextUnformatted($"Debug Territory ID: {territoryId}");
+                //ImGui.Spacing();
+                //ImGui.TextUnformatted($"Debug is housing instance: {Housing.GetLocationSuffix() != null}");
 
                 if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
                 {
