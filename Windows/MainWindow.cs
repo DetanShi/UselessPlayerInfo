@@ -57,6 +57,11 @@ public class MainWindow : Window
                 {
                     plugin.ToggleLocationsUI();
                 }
+                ImGui.Spacing();
+                if (ImGui.Button("Show Saved Locations Window"))
+                {
+                    plugin.ToggleSavedLocationsUI();
+                }
 
             }
 
