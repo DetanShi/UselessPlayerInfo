@@ -77,11 +77,7 @@ public class JobWindow : Window
                 ImGui.AlignTextToFramePadding();
                 ImGui.TextUnformatted($"{localPlayer.ClassJob.Value.NameEnglish} ({localPlayer.ClassJob.Value.Abbreviation}) - Level {localPlayer.Level}");
                 ImGui.Spacing();
-                # if DEBUG
-                ImGui.TextUnformatted($"DEBUG JOB ID - {localPlayer.ClassJob.Value.JobIndex}");
-                ImGui.Spacing();
-                # endif
-                ImGui.TextUnformatted("Job Levels");
+                ImGui.Separator();
                 ImGui.Spacing();
 
                 if (ImGui.BeginTabBar("JobRoleTabs", ImGuiTabBarFlags.None))
@@ -134,6 +130,7 @@ public class JobWindow : Window
                 ImGui.AlignTextToFramePadding();
                 var level = GetJobLevel(id);
                 ImGui.TextUnformatted(level > 0 ? level.ToString() : "-");
+
             }
 
             ImGui.EndTable();
@@ -157,4 +154,17 @@ public class JobWindow : Window
 
         return Plugin.PlayerState.GetClassJobLevel(classJob);
     }
+
+/*
+    private static int GetJobExperience(uint jobId)
+    {
+        if (!Plugin.DataManager.GetExcelSheet<ClassJob>().TryGetRow(jobId, out var classJob))
+        {
+            return 0;
+        }
+
+        return Plugin.PlayerState.GetClassJobExperience(classJob);
+    }
+    */
+
 }
