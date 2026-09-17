@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Reflection;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
@@ -11,6 +12,11 @@ namespace UselessPlayerInfo.Windows;
 
 public class MainWindow : Window
 {
+    private const float IconSize = 24f;
+    private const float ButtonHeight = 32f;
+
+    private static readonly Vector4 SubtleColor = new(0.65f, 0.65f, 0.65f, 1f);
+
     private readonly Plugin plugin;
 
     // We give this window a hidden ID using ##.
@@ -21,9 +27,12 @@ public class MainWindow : Window
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(200, 150),
+            MinimumSize = new Vector2(300, 300),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
+
+        Size = new Vector2(320, 320);
+        SizeCondition = ImGuiCond.FirstUseEver;
 
         this.plugin = plugin;
     }
@@ -41,33 +50,94 @@ public class MainWindow : Window
             // Check if this child is drawing
             if (child.Success)
             {
-
-                // Example for other services that Dalamud provides.
-                // ClientState provides a wrapper filled with information about the local player object and client.
-
-                //ImGui.SameLine();
-                ImGui.AlignTextToFramePadding();
+                DrawHeader();
                 ImGui.Spacing();
-                if (ImGui.Button("Show Job Window"))
-                {
-                    plugin.ToggleJobWindowUi();
-                }
+                ImGui.Separator();
                 ImGui.Spacing();
-                if (ImGui.Button("Show Location Window"))
-                {
-                    plugin.ToggleLocationsUI();
-                }
-                ImGui.Spacing();
-                if (ImGui.Button("Show Saved Locations Window"))
-                {
-                    plugin.ToggleSavedLocationsUI();
-                }
 
+                DrawPlayerSummary();
+
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+
+                DrawNavigation();
             }
-
-
         }
 
+    }
+
+    private static void DrawHeader()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+        ImGui.SetWindowFontScale(1.3f);
+        ImGui.TextUnformatted("Useless Player Info");
+        ImGui.SetWindowFontScale(1f);
+
+        ImGui.TextColored(SubtleColor, version == null ? "" : $"v{version.Major}.{version.Minor}.{version.Build}.{version.Revision}");
+    }
+
+    private static void DrawPlayerSummary()
+    {
+        var localPlayer = Plugin.ObjectTable.LocalPlayer;
+        if (localPlayer == null)
+        {
+            ImGui.TextColored(SubtleColor, "Log into a character to see player info.");
+            return;
+        }
+
+        ImGui.TextUnformatted(localPlayer.Name.TextValue);
+
+        if (localPlayer.ClassJob.IsValid)
+        {
+            DrawJobIcon(localPlayer.ClassJob.RowId, IconSize);
+            ImGui.SameLine();
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextUnformatted($"{localPlayer.ClassJob.Value.Abbreviation} - Level {localPlayer.Level}");
+        }
+
+        var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
+        if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+        {
+            var locationSuffix = Housing.GetLocationSuffix();
+            var location = locationSuffix != null
+                ? $"{territoryRow.PlaceName.Value.Name}, {locationSuffix}"
+                : territoryRow.PlaceName.Value.Name.ToString();
+
+            ImGui.TextColored(SubtleColor, location);
+        }
+    }
+
+    private void DrawNavigation()
+    {
+        var width = ImGui.GetContentRegionAvail().X;
+        var buttonSize = new Vector2(width, ButtonHeight);
+
+        if (ImGui.Button("Job Levels", buttonSize))
+        {
+            plugin.ToggleJobWindowUi();
+        }
+
+        ImGui.Spacing();
+
+        if (ImGui.Button("Current Location", buttonSize))
+        {
+            plugin.ToggleLocationsUI();
+        }
+
+        ImGui.Spacing();
+
+        if (ImGui.Button("Saved Locations", buttonSize))
+        {
+            plugin.ToggleSavedLocationsUI();
+        }
+    }
+
+    private static void DrawJobIcon(uint jobId, float size)
+    {
+        var icon = Plugin.TextureProvider.GetFromGameIcon(new GameIconLookup(Jobs.GetIconId(jobId))).GetWrapOrEmpty();
+        ImGui.Image(icon.Handle, new Vector2(size, size));
     }
 
 }
