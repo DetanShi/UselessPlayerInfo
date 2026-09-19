@@ -33,15 +33,12 @@ public sealed class Plugin : IDalamudPlugin
     private const string MainWindowCMD = "/uselessinfo";
     private const string JobWindowCMD = "/jobinfo";
     private const string WhereAmI = "/whereami";
-    private const string LocationsCMD = "/locationinfo";
     private const string SavedLocationsCMD = "/savedlocations";
 
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("UselessInfo");
     private JobWindow JobWindow { get; init; }
-
-    private LocationWindow LocationWindow { get; init; }
 
     private SavedLocationsWindow SavedLocationsWindow { get; init; }
 
@@ -52,12 +49,10 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         JobWindow = new JobWindow(this);
-        LocationWindow = new LocationWindow(this);
         SavedLocationsWindow = new SavedLocationsWindow(this);
         MainWindow = new MainWindow(this);
 
         WindowSystem.AddWindow(JobWindow);
-        WindowSystem.AddWindow(LocationWindow);
         WindowSystem.AddWindow(SavedLocationsWindow);
         WindowSystem.AddWindow(MainWindow);
 
@@ -74,11 +69,6 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager.AddHandler(WhereAmI, new CommandInfo(OnCommand)
         {
             HelpMessage = "Prints your current location information to chat."
-        });
-
-        CommandManager.AddHandler(LocationsCMD, new CommandInfo(OnCommand)
-        {
-            HelpMessage = "Opens the Locations Window for displaying saved locations. (WIP)"
         });
 
         CommandManager.AddHandler(SavedLocationsCMD, new CommandInfo(OnCommand)
@@ -110,7 +100,6 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(MainWindowCMD);
         CommandManager.RemoveHandler(JobWindowCMD);
-        CommandManager.RemoveHandler(LocationsCMD);
         CommandManager.RemoveHandler(SavedLocationsCMD);
         CommandManager.RemoveHandler(WhereAmI);
     }
@@ -130,9 +119,6 @@ public sealed class Plugin : IDalamudPlugin
                 break;
             case WhereAmI:
                 PrintWhereAmI();
-                break;
-            case LocationsCMD:
-                LocationWindow.Toggle();
                 break;
             case SavedLocationsCMD:
                 SavedLocationsWindow.Toggle();
@@ -176,7 +162,6 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleMainWindowUi() => MainWindow.Toggle();
     public void ToggleJobWindowUi() => JobWindow.Toggle();
-    public void ToggleLocationsUI() => LocationWindow.Toggle();
     public void ToggleSavedLocationsUI() => SavedLocationsWindow.Toggle();
 
 }

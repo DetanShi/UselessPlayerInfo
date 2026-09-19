@@ -5,6 +5,7 @@ using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
+using Dalamud.Utility;
 using Lumina.Excel.Sheets;
 using UselessPlayerInfo.Functions;
 
@@ -14,25 +15,19 @@ public class MainWindow : Window
 {
     private const float IconSize = 24f;
     private const float ButtonHeight = 32f;
-
+    private const float WeatherIconSize = 24f;
     private static readonly Vector4 SubtleColor = new(0.65f, 0.65f, 0.65f, 1f);
-
+    private static readonly Vector4 ErrorColor = new Vector4(0.90f, 0.30f, 0.30f, 1f);
     private readonly Plugin plugin;
 
-    // We give this window a hidden ID using ##.
-    // The user will see "My Amazing Window" as window title,
-    // but for ImGui the ID is "My Amazing Window##With a hidden ID"
     public MainWindow(Plugin plugin)
-        : base("Useless Info: Main Page", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        : base("Useless Main Page", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(300, 300),
-            MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
+            MinimumSize = new Vector2(300, 315),
+            MaximumSize = new Vector2(300, 315)
         };
-
-        Size = new Vector2(320, 320);
-        SizeCondition = ImGuiCond.FirstUseEver;
 
         this.plugin = plugin;
     }
@@ -41,10 +36,6 @@ public class MainWindow : Window
 
     public override void Draw()
     {
-
-        // Normally a BeginChild() would have to be followed by an unconditional EndChild(),
-        // ImRaii takes care of this after the scope ends.
-        // This works for all ImGui functions that require specific handling, examples are BeginTable() or Indent().
         using (var child = ImRaii.Child("MainInfoWindow", Vector2.Zero, true))
         {
             // Check if this child is drawing
@@ -56,6 +47,12 @@ public class MainWindow : Window
                 ImGui.Spacing();
 
                 DrawPlayerSummary();
+
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+
+                DrawLocationSummary();
 
                 ImGui.Spacing();
                 ImGui.Separator();
@@ -83,7 +80,7 @@ public class MainWindow : Window
         var localPlayer = Plugin.ObjectTable.LocalPlayer;
         if (localPlayer == null)
         {
-            ImGui.TextColored(SubtleColor, "Log into a character to see player info.");
+            ImGui.TextColored(ErrorColor, "Log into a character to see player info.");
             return;
         }
 
@@ -97,16 +94,32 @@ public class MainWindow : Window
             ImGui.TextUnformatted($"{localPlayer.ClassJob.Value.Abbreviation} - Level {localPlayer.Level}");
         }
 
-        var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
-        if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
-        {
-            var locationSuffix = Housing.GetLocationSuffix();
-            var location = locationSuffix != null
-                ? $"{territoryRow.PlaceName.Value.Name}, {locationSuffix}"
-                : territoryRow.PlaceName.Value.Name.ToString();
+    }
 
-            ImGui.TextColored(SubtleColor, location);
+    private static void DrawLocationSummary()
+    {
+        var localPlayer = Plugin.ObjectTable.LocalPlayer;
+        if (localPlayer != null)
+        {
+            DrawWeather();
+            var territoryId = Housing.GetOriginalHouseTerritoryTypeId() ?? Plugin.ClientState.TerritoryType;
+            if (Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(territoryId, out var territoryRow))
+            {
+                var locationSuffix = Housing.GetLocationSuffix();
+                var location = locationSuffix != null
+                    ? $"{territoryRow.PlaceName.Value.Name}, {locationSuffix}"
+                    : territoryRow.PlaceName.Value.Name.ToString();
+
+                ImGui.TextColored(SubtleColor, location);
+            }
+
+            if (!Housing.IsInsideHousing())
+            {
+                var mapCoords = localPlayer.GetMapCoordinates(false);
+                ImGui.TextColored(SubtleColor, $"Map: {mapCoords.X:0.0}, {mapCoords.Y:0.0}");
+            }
         }
+
     }
 
     private void DrawNavigation()
@@ -121,11 +134,6 @@ public class MainWindow : Window
 
         ImGui.Spacing();
 
-        if (ImGui.Button("Current Location", buttonSize))
-        {
-            plugin.ToggleLocationsUI();
-        }
-
         ImGui.Spacing();
 
         if (ImGui.Button("Saved Locations", buttonSize))
@@ -138,6 +146,23 @@ public class MainWindow : Window
     {
         var icon = Plugin.TextureProvider.GetFromGameIcon(new GameIconLookup(Jobs.GetIconId(jobId))).GetWrapOrEmpty();
         ImGui.Image(icon.Handle, new Vector2(size, size));
+    }
+
+    private static void DrawWeather()
+    {
+        var weatherId = WeatherHelper.GetCurrentWeatherId();
+
+        if (!Plugin.DataManager.GetExcelSheet<Weather>().TryGetRow(weatherId, out var weatherRow))
+        {
+            ImGui.TextColored(SubtleColor, "Unknown weather.");
+            return;
+        }
+
+        var icon = Plugin.TextureProvider.GetFromGameIcon(new GameIconLookup((uint)weatherRow.Icon)).GetWrapOrEmpty();
+        ImGui.Image(icon.Handle, new Vector2(WeatherIconSize, WeatherIconSize));
+        ImGui.SameLine();
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextUnformatted(weatherRow.Name.ToString());
     }
 
 }

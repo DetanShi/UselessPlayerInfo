@@ -39,6 +39,13 @@ internal static class Housing
         return suffix;
     }
 
+    // True while inside a house, apartment, or private room, where map coordinates are meaningless.
+    public static unsafe bool IsInsideHousing()
+    {
+        var housingManager = HousingManager.Instance();
+        return housingManager != null && housingManager->IsInside();
+    }
+
     //Retrieve the original outdoor area type instead of the generic interior instance.
     public static unsafe uint? GetOriginalHouseTerritoryTypeId()
     {
@@ -64,6 +71,26 @@ internal static class Housing
         var room = housingManager->GetCurrentRoom();
 
         return (ward, plot, room);
+    }
+
+    // Check for if on a housing plot or in a building/room
+    public static unsafe bool CanSaveCurrentLocation()
+    {
+        var housingManager = HousingManager.Instance();
+        if (housingManager == null || !(housingManager->IsInside() || housingManager->IsOutside()))
+        {
+            return false;
+        }
+
+        var plot = housingManager->GetCurrentPlot();
+        var room = housingManager->GetCurrentRoom();
+
+        if (plot is ApartmentMainDivisionPlot or ApartmentSubdivisionPlot)
+        {
+            return room > 0;
+        }
+
+        return plot >= 0;
     }
 
     public static string? DescribeCoords(int ward, int plot, int room)
