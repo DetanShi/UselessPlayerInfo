@@ -25,8 +25,8 @@ public class MainWindow : Window
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(300, 315),
-            MaximumSize = new Vector2(300, 315)
+            MinimumSize = new Vector2(300, 340),
+            MaximumSize = new Vector2(300, 340)
         };
 
         this.plugin = plugin;
