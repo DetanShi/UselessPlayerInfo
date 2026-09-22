@@ -33,14 +33,14 @@ public sealed class Plugin : IDalamudPlugin
     private const string MainWindowCMD = "/uselessinfo";
     private const string JobWindowCMD = "/jobinfo";
     private const string WhereAmI = "/whereami";
-    private const string SavedLocationsCMD = "/savedlocations";
+    private const string HousingListCMD = "/housinglist";
 
     public Configuration Configuration { get; init; }
 
     public readonly WindowSystem WindowSystem = new("UselessInfo");
     private JobWindow JobWindow { get; init; }
 
-    private SavedLocationsWindow SavedLocationsWindow { get; init; }
+    private HousingListWindow HousingListWindow { get; init; }
 
     private MainWindow MainWindow { get; init; }
 
@@ -49,11 +49,11 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         JobWindow = new JobWindow(this);
-        SavedLocationsWindow = new SavedLocationsWindow(this);
+        HousingListWindow = new HousingListWindow(this);
         MainWindow = new MainWindow(this);
 
         WindowSystem.AddWindow(JobWindow);
-        WindowSystem.AddWindow(SavedLocationsWindow);
+        WindowSystem.AddWindow(HousingListWindow);
         WindowSystem.AddWindow(MainWindow);
 
         CommandManager.AddHandler(MainWindowCMD, new CommandInfo(OnCommand)
@@ -71,9 +71,9 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Prints your current location information to chat."
         });
 
-        CommandManager.AddHandler(SavedLocationsCMD, new CommandInfo(OnCommand)
+        CommandManager.AddHandler(HousingListCMD, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Opens the Saved Locations Window for adding and removing saved locations."
+            HelpMessage = "Opens the Saved Houses Window for adding and removing saved Houses and Apartments/Chambers."
         });
 
         // Tell the UI system that we want our windows to be drawn throught he window system
@@ -100,7 +100,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.RemoveHandler(MainWindowCMD);
         CommandManager.RemoveHandler(JobWindowCMD);
-        CommandManager.RemoveHandler(SavedLocationsCMD);
+        CommandManager.RemoveHandler(HousingListCMD);
         CommandManager.RemoveHandler(WhereAmI);
     }
 
@@ -120,8 +120,8 @@ public sealed class Plugin : IDalamudPlugin
             case WhereAmI:
                 PrintWhereAmI();
                 break;
-            case SavedLocationsCMD:
-                SavedLocationsWindow.Toggle();
+            case HousingListCMD:
+                HousingListWindow.Toggle();
                 break;
             default:
                 break;
@@ -162,6 +162,6 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleMainWindowUi() => MainWindow.Toggle();
     public void ToggleJobWindowUi() => JobWindow.Toggle();
-    public void ToggleSavedLocationsUI() => SavedLocationsWindow.Toggle();
+    public void ToggleHousingListWindowUI() => HousingListWindow.Toggle();
 
 }

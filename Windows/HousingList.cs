@@ -9,7 +9,7 @@ using UselessPlayerInfo.Objects;
 
 namespace UselessPlayerInfo.Windows;
 
-public class SavedLocationsWindow : Window
+public class HousingListWindow : Window
 {
     private readonly Plugin plugin;
     private string newName = "";
@@ -20,8 +20,8 @@ public class SavedLocationsWindow : Window
 
     private static readonly Vector4 ErrorColor = new Vector4(0.90f, 0.30f, 0.30f, 1f);
 
-    public SavedLocationsWindow(Plugin plugin)
-        : base("Useless Saved Locations", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+    public HousingListWindow(Plugin plugin)
+        : base("Useless Housing List", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {

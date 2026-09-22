@@ -136,9 +136,9 @@ public class MainWindow : Window
 
         ImGui.Spacing();
 
-        if (ImGui.Button("Saved Locations", buttonSize))
+        if (ImGui.Button("Housing Notes", buttonSize))
         {
-            plugin.ToggleSavedLocationsUI();
+            plugin.ToggleHousingListWindowUI();
         }
     }
 
