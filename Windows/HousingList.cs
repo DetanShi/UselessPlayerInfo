@@ -136,7 +136,7 @@ public class HousingListWindow : Window
 
     private void ImportLocation()
     {
-        if (!SavedLocation.TryParseCode(importCode, out var location) || location == null)
+        if (!HousingLocation.TryParseCode(importCode, out var location) || location == null)
         {
             importError = "Invalid Code.";
             return;
@@ -155,7 +155,7 @@ public class HousingListWindow : Window
         }
 
         location.Name = importName;
-        plugin.Configuration.SavedLocations.Add(location);
+        plugin.Configuration.HousingLocations.Add(location);
         plugin.Configuration.Save();
 
         importCode = "";
@@ -165,7 +165,7 @@ public class HousingListWindow : Window
 
     private void DrawTable()
     {
-        var locations = plugin.Configuration.SavedLocations;
+        var locations = plugin.Configuration.HousingLocations;
 
         if (locations.Count == 0)
         {
@@ -247,7 +247,7 @@ public class HousingListWindow : Window
                 $"TerritoryId: {territoryId}, WorldId: {worldId}");
         }
 
-        plugin.Configuration.SavedLocations.Add(new SavedLocation
+        plugin.Configuration.HousingLocations.Add(new HousingLocation
         {
             Name = newName,
             TerritoryId = territoryId,
@@ -257,13 +257,13 @@ public class HousingListWindow : Window
             Room = coords?.Room ?? 0,
         });
 
-        Plugin.Log.Debug($"Saving configuration with {plugin.Configuration.SavedLocations.Count.ToString()} saved locations.");
+        Plugin.Log.Debug($"Saving configuration with {plugin.Configuration.HousingLocations.Count.ToString()} saved locations.");
 
         plugin.Configuration.Save();
         newName = "";
     }
 
-    private static string DescribeLocation(SavedLocation loc)
+    private static string DescribeLocation(HousingLocation loc)
     {
         if (!Plugin.DataManager.GetExcelSheet<TerritoryType>().TryGetRow(loc.TerritoryId, out var territoryRow))
         {

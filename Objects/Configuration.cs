@@ -9,7 +9,7 @@ public class Configuration : IPluginConfiguration
 {
     public int Version { get; set; } = 0;
 
-    public List<SavedLocation> SavedLocations { get; set; } = new();
+    public List<HousingLocation> HousingLocations { get; set; } = new();
 
     public void Save()
     {

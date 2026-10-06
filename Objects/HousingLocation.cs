@@ -5,7 +5,7 @@ using System.Text;
 namespace UselessPlayerInfo.Objects;
 
 [Serializable]
-public class SavedLocation
+public class HousingLocation
 {
     public string Name { get; set; } = "";
     public uint TerritoryId { get; set; }
@@ -20,7 +20,7 @@ public class SavedLocation
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(raw));
     }
 
-    public static bool TryParseCode(string code, out SavedLocation? location)
+    public static bool TryParseCode(string code, out HousingLocation? location)
     {
         location = null;
 
@@ -39,7 +39,7 @@ public class SavedLocation
                 return false;
             }
 
-            location = new SavedLocation
+            location = new HousingLocation
             {
                 TerritoryId = territoryId,
                 WorldId = worldId,
